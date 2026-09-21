@@ -1,0 +1,357 @@
+{
+  "ctor": {
+    "params": [],
+    "kwparams": {}
+  },
+  "methods": {
+    "cancel_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "cast_vote": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ],
+        [
+          "delegate_id",
+          "string"
+        ],
+        [
+          "choice",
+          "string"
+        ],
+        [
+          "rationale",
+          "string"
+        ],
+        [
+          "evidence_urls",
+          "array"
+        ],
+        [
+          "now_ts",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "claim_compensation": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "int",
+      "payable": false
+    },
+    "close_voting": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ],
+        [
+          "now_ts",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "create_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ],
+        [
+          "title",
+          "string"
+        ],
+        [
+          "description",
+          "string"
+        ],
+        [
+          "outcome_evidence_urls",
+          "array"
+        ],
+        [
+          "voting_deadline",
+          "int"
+        ],
+        [
+          "resolution_deadline",
+          "int"
+        ],
+        [
+          "now_ts",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "delegate_stake": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": true
+    },
+    "get_delegate": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_delegation": {
+      "params": [
+        [
+          "delegator",
+          "string"
+        ],
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_protocol_stats": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_vote": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ],
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "list_delegate_ids": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "list_proposal_ids": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "string"
+        }
+      ]
+    },
+    "preview_effective_weight": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "reclaim_stale_vote_bond_share": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ],
+        [
+          "delegate_id",
+          "string"
+        ],
+        [
+          "now_ts",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "register_delegate": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ],
+        [
+          "metadata_uri",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": true
+    },
+    "request_unbond": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ],
+        [
+          "now_ts",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "resolve_vote_outcome": {
+      "params": [
+        [
+          "proposal_id",
+          "string"
+        ],
+        [
+          "delegate_id",
+          "string"
+        ],
+        [
+          "now_ts",
+          "int"
+        ],
+        [
+          "supplemental_image",
+          "bytes"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "set_paused": {
+      "params": [
+        [
+          "paused",
+          "bool"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "top_up_bond": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": true
+    },
+    "transfer_ownership": {
+      "params": [
+        [
+          "new_owner",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "withdraw_bond": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ],
+        [
+          "now_ts",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "withdraw_delegation": {
+      "params": [
+        [
+          "delegate_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    }
+  }
+}
