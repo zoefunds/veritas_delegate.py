@@ -1,6 +1,6 @@
-// Re-attempt resolve_vote_outcome on the vote left unresolved by the first
-// smoke-test run (which passed malformed image bytes). Reuses the same
-// proposal_id / delegate_id; no new registration/delegation/voting needed.
+// Resolve an existing unresolved vote after the resolution window opens.
+// Supply the target identifiers explicitly; this script is not tied to a
+// historical smoke-test deployment.
 
 import fs from "node:fs";
 import { ethers } from "ethers";
@@ -8,7 +8,7 @@ import path from "node:path";
 
 const gl = await import("genlayer-js");
 
-const CONTRACT_ADDRESS = "0x0E700fFBA3F6679232d4Aa533C6f879A28e69614";
+const CONTRACT_ADDRESS = process.env.VERITAS_CONTRACT_ADDRESS || "0xdb18abE502829D0Ff2FE5856ab1EB3BC6a5a5783";
 const KEYSTORE_PATH = path.join(process.env.HOME, ".genlayer/keystores/veritas_tester.json");
 const KEYSTORE_PASSWORD = process.env.VERITAS_TEST_KEYSTORE_PASSWORD;
 if (!KEYSTORE_PASSWORD) {
@@ -17,8 +17,12 @@ if (!KEYSTORE_PASSWORD) {
   );
 }
 
-const PROPOSAL_ID = "prop_smoke_1790004428408";
-const DELEGATE_ID = "veritas_smoke_1790004428408";
+const PROPOSAL_ID = process.env.VERITAS_PROPOSAL_ID;
+const DELEGATE_ID = process.env.VERITAS_DELEGATE_ID;
+
+if (!PROPOSAL_ID || !DELEGATE_ID) {
+  throw new Error("Set VERITAS_PROPOSAL_ID and VERITAS_DELEGATE_ID before running this script.");
+}
 
 function log(label, value) {
   console.log(`\n=== ${label} ===`);

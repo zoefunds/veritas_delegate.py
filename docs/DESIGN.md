@@ -150,10 +150,11 @@ status whenever an LLM's score legitimately swings by more than the
 window on a genuinely ambiguous case — and ambiguous cases are exactly
 when the network most needs to still reach a *determinate* result (which
 should usually be `INCONCLUSIVE`, not a stalled transaction). Bucketing
-into 5 bands, and additionally treating adjacent bands as agreement, gives
-a strictly larger tolerance envelope while still meaningfully
-discriminating "clearly shipped" (bucket 4) from "clearly failed" (bucket
-0).
+into 5 bands, and treating adjacent bands as agreement only when they map to
+the same consequential verdict, gives a larger tolerance envelope while
+preserving the boundary between "clearly shipped" (bucket 4), ambiguous
+(bucket 2), and "clearly failed" (bucket 0). This prevents validator
+disagreement from changing integrity, voting weight, or slashing behavior.
 
 ## Why derived signals instead of raw page text
 
@@ -226,7 +227,10 @@ control, input validation, every documented revert message, the full
 delegate lifecycle (register → top-up → unbond → withdraw), the full
 delegation lifecycle, proposal/vote creation and validation, the
 slash/compensation math end-to-end (via mocked web/LLM responses), and the
-stale-resolution recovery path. **What it does not exercise**: actual
+stale-resolution recovery path. `tests/test_alignment_consensus.py` adds two
+deterministic regression tests covering all consequential adjacent-bucket
+and non-adjacent-bucket cases. The full suite currently has 20 passing tests.
+**What it does not exercise**: actual
 validator disagreement/consensus behavior, since direct mode runs only the
 leader function — `gl.vm.run_nondet_unsafe`'s `validator_fn` is invoked as
 plain Python but there's no second, independently-executing node to
@@ -234,9 +238,8 @@ disagree with. That gap is closed by the live integration run below.
 
 ## What the live integration run proved
 
-`scripts/live_smoke_test.mjs` and `scripts/resolve_existing_vote.mjs` were
-run against the deployed instance
-(`0x0E700fFBA3F6679232d4Aa533C6f879A28e69614`) on GenLayer StudioNet with 5
+`scripts/live_smoke_test.mjs` was run against the deployed instance
+(`0xdb18abE502829D0Ff2FE5856ab1EB3BC6a5a5783`) on GenLayer StudioNet with 5
 real validators running a mix of Claude, GPT, and Gemini models behind
 different providers (openrouter, llm-router). Results:
 

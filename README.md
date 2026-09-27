@@ -6,8 +6,8 @@ to them, by checking their stated voting rationale against real-world
 outcomes through validator consensus, and automatically slashing/decaying
 delegates whose reasoning stops matching reality.
 
-Deployed reference instance (GenLayer StudioNet):
-`0x0E700fFBA3F6679232d4Aa533C6f879A28e69614`
+Latest verified reference instance (GenLayer StudioNet):
+`0xdb18abE502829D0Ff2FE5856ab1EB3BC6a5a5783`
 
 ---
 
@@ -242,7 +242,8 @@ the deployed instance.
    derive a stable signal from it (`POSITIVE`/`NEGATIVE`/`MIXED`/`UNCLEAR`),
    and independently ask an LLM to score how well Alice's rationale matches
    that signal, bucketed 0–4. If ≥3 of 5 validators land on the same or an
-   adjacent bucket, consensus reaches `MAJORITY_AGREE` and the vote resolves.
+   adjacent bucket without changing the final verdict, consensus reaches
+   `MAJORITY_AGREE` and the vote resolves.
 6. **Outcome A — the grant shipped.** Verdict `ALIGNED`. Alice's integrity
    score EMA-updates upward (75.00% → 81.25%). No slash. Bob's delegation is
    untouched.
@@ -264,9 +265,11 @@ this was the explicit design brief, and it's been validated live (see
 
 - **Bucketed alignment, not raw scores.** The LLM's 0–100 alignment score
   is mapped into 5 coarse bands (`_bucket_score`). Validators agree if
-  their bucket matches the leader's **or is adjacent** — a strictly larger
-  tolerance envelope than a fixed numeric window, because it scales with
-  how coarse the underlying judgment genuinely is.
+  their bucket matches the leader's, or is adjacent while mapping to the
+  same consequential verdict. This preserves tolerance for score jitter
+  within `MISALIGNED` (0↔1) or `ALIGNED` (3↔4), but rejects boundary
+  disagreements such as `MISALIGNED`↔`INCONCLUSIVE` (1↔2) and
+  `INCONCLUSIVE`↔`ALIGNED` (2↔3).
 - **Derived signals, not raw page text.** Raw web content is reduced to
   one of four stable strings (`POSITIVE` / `NEGATIVE` / `MIXED` /
   `UNCLEAR`) via keyword-based derivation (`_derive_page_signal`) *before*
@@ -414,8 +417,10 @@ notes for the `on="accepted"` vs `on="finalized"` tradeoff.
 - [`contracts/veritas_delegate.py`](contracts/veritas_delegate.py) — the
   contract (1,400+ lines).
 - [`contracts/abi.json`](contracts/abi.json) — extracted ABI schema.
-- [`tests/test_veritas_direct.py`](tests/test_veritas_direct.py) — 18
-  direct-mode tests covering every state transition and revert path.
+- [`tests/test_veritas_direct.py`](tests/test_veritas_direct.py) and
+  [`tests/test_alignment_consensus.py`](tests/test_alignment_consensus.py) —
+  20 tests covering state transitions, revert paths, and the consequential
+  verdict bucket-boundary matrix.
 - [`scripts/live_smoke_test.mjs`](scripts/live_smoke_test.mjs) /
   [`scripts/resolve_existing_vote.mjs`](scripts/resolve_existing_vote.mjs)
   — live integration scripts used against the deployed instance.
@@ -455,7 +460,7 @@ export VERITAS_TEST_KEYSTORE_PASSWORD="<password for your own test keystore>"
 node scripts/live_smoke_test.mjs
 ```
 
-This was run against `0x0E700fFBA3F6679232d4Aa533C6f879A28e69614` on
+This was run against `0xdb18abE502829D0Ff2FE5856ab1EB3BC6a5a5783` on
 StudioNet with 5 real validators running a mix of Claude/GPT/Gemini
 models. Every step (`register_delegate`, `delegate_stake`,
 `create_proposal`, `cast_vote`, `resolve_vote_outcome`) reached

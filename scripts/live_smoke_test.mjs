@@ -13,7 +13,7 @@ import path from "node:path";
 
 const gl = await import("genlayer-js");
 
-const CONTRACT_ADDRESS = "0x0E700fFBA3F6679232d4Aa533C6f879A28e69614";
+const CONTRACT_ADDRESS = "0xdb18abE502829D0Ff2FE5856ab1EB3BC6a5a5783";
 const KEYSTORE_PATH = path.join(
   process.env.HOME,
   ".genlayer/keystores/veritas_tester.json",

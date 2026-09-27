@@ -41,8 +41,8 @@
 #   requires validators to agree on an exact float score, an exact string,
 #   or a byte-identical web page will drift into "undetermined" almost every
 #   time real LLMs and real web pages are involved. Veritas instead:
-#     - buckets alignment scores into 5 coarse bands (0..4) and only requires
-#       agreement on the band, not the raw score.
+#     - buckets alignment scores into 5 coarse bands (0..4), tolerating
+#       adjacent-band jitter only when it preserves the same final verdict.
 #     - normalizes rationale/outcome text (lowercase, whitespace-collapsed)
 #       before any comparison.
 #     - derives a small set of stable boolean/enum fields from web content
@@ -312,6 +312,14 @@ def _bucket_to_verdict(bucket: int) -> str:
     if bucket == 2:
         return OUTCOME_INCONCLUSIVE
     return OUTCOME_MISALIGNED
+
+
+def _buckets_preserve_verdict(leader_bucket: int, validator_bucket: int) -> bool:
+    """Return whether bucket jitter is safe for consensus consequences."""
+    return (
+        _bucket_to_verdict(leader_bucket) == _bucket_to_verdict(validator_bucket)
+        and abs(leader_bucket - validator_bucket) <= 1
+    )
 
 
 def _handle_leader_error(leaders_res: "gl.vm.Result", leader_fn: typing.Callable) -> bool:
@@ -1057,13 +1065,14 @@ class VeritasDelegateAccountability(gl.Contract):
             leader_data = leaders_res.calldata
             validator_data = leader_fn()
 
-            # Tolerance #1: bucket-level agreement only (not raw score).
-            if leader_data.get("bucket") != validator_data.get("bucket"):
-                # Allow adjacent-bucket drift (off-by-one band) as agreement —
-                # LLM scoring jitter across independent calls routinely lands
-                # one band apart even when both are "clearly aligned".
-                if abs(int(leader_data.get("bucket", 0)) - int(validator_data.get("bucket", 0))) > 1:
-                    return False
+            # Tolerance #1: allow bucket jitter only when it preserves the
+            # consequential verdict. Adjacent buckets can straddle an outcome
+            # boundary (1/2 or 2/3), and treating those as agreement would let
+            # validators disagree on integrity, voting weight, or slashing.
+            leader_bucket = int(leader_data.get("bucket", 0))
+            validator_bucket = int(validator_data.get("bucket", 0))
+            if not _buckets_preserve_verdict(leader_bucket, validator_bucket):
+                return False
 
             # Tolerance #2: page signals must roughly agree — allow any
             # single-source mismatch (transient page changes, caching,
